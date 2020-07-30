@@ -4,6 +4,7 @@ module.exports = {
     es2020: true,
     node: true,
     es6: true,
+    "jest/globals": true,
   },
   extends: ["eslint:recommended", "plugin:react/recommended"],
   parserOptions: {
