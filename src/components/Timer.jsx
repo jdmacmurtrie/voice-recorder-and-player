@@ -1,14 +1,13 @@
 import React, { Component } from "react";
-import { bool, func, number, oneOfType, string } from "prop-types";
+import { bool, func } from "prop-types";
 import moment from "moment";
 
 export default class Timer extends Component {
   static propTypes = {
     isRunning: bool,
-    maxTime: oneOfType([number, string]).isRequired,
-    maxTimeWarning: oneOfType([number, string]),
     onTimerStop: func,
     reportElapsedTime: func,
+    resetTimer: bool,
   };
 
   static defaultProps = {
@@ -17,12 +16,6 @@ export default class Timer extends Component {
 
   constructor(props) {
     super(props);
-
-    /*
-      The maxTime prop can be either formatted either as a single number representing minutes, or as "minutes:seconds".
-      If a single number is passed, it may be either a string or a number.
-    */
-    this.maxTime = this.formatAsTime(moment(props.maxTime, "mmss"));
 
     this.state = {
       elapsedTime: "00:00",
@@ -38,7 +31,7 @@ export default class Timer extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { isRunning } = this.props;
+    const { isRunning, resetTimer } = this.props;
     const { elapsedTime } = this.state;
 
     if (prevProps.isRunning !== isRunning) {
@@ -51,6 +44,10 @@ export default class Timer extends Component {
 
     if (elapsedTime === this.maxTime && isRunning) {
       this.handleStop();
+    }
+
+    if (resetTimer && elapsedTime !== "00:00") {
+      this.setState({ elapsedTime: "00:00" });
     }
   }
 
@@ -96,24 +93,9 @@ export default class Timer extends Component {
     return time.format("mm:ss");
   }
 
-  get warningActive() {
-    const { maxTimeWarning } = this.props;
-    const { elapsedTime } = this.state;
-
-    const secondsRemaining =
-      moment.duration(`00:${this.maxTime}`).asSeconds() -
-      moment.duration(`00:${elapsedTime}`).asSeconds();
-
-    return secondsRemaining <= maxTimeWarning;
-  }
-
   render() {
-    const { maxTimeWarning } = this.props;
     const { elapsedTime } = this.state;
 
-    const warningClass =
-      maxTimeWarning && this.warningActive ? "warning" : undefined;
-
-    return <div className={warningClass}>{elapsedTime}</div>;
+    return <div>{elapsedTime}</div>;
   }
 }

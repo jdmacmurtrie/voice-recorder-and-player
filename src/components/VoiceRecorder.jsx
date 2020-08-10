@@ -1,10 +1,8 @@
 import React, { Component, Fragment } from "react";
-import { func, string } from "prop-types";
+import { func } from "prop-types";
 import MicRecorder from "mic-recorder-to-mp3";
-import moment from "moment";
 
 import Timer from "./Timer";
-import ProgressBar from "./ProgressBar";
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -12,7 +10,6 @@ const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
 export default class VoiceRecorder extends Component {
   static propTypes = {
-    maxRecordingTime: string.isRequired,
     onRecordStart: func,
     onRecordStop: func,
   };
@@ -21,24 +18,23 @@ export default class VoiceRecorder extends Component {
     super(props);
 
     this.initialPlayerState = {
-      isPlaying: false,
-      currentTime: "00:00",
-      rawCurrentTime: 0,
-    };
-
-    this.reportElapsedTime = this.reportElapsedTime.bind(this);
-    this.startRecording = this.startRecording.bind(this);
-    this.stopRecording = this.stopRecording.bind(this);
-
-    this.state = {
       isBlocked: false,
       isRecording: false,
       rawDuration: 0,
       recordedAudio: "",
       recordingDuration: "00:00",
       recordingElapsed: "0",
-      ...this.initialPlayerState,
+      resetTimer: true,
+      isPlaying: false,
+      currentTime: "00:00",
+      rawCurrentTime: 0,
     };
+
+    this.resetRecorder = this.resetRecorder.bind(this);
+    this.startRecording = this.startRecording.bind(this);
+    this.stopRecording = this.stopRecording.bind(this);
+
+    this.state = this.initialPlayerState;
   }
 
   componentDidMount() {
@@ -46,6 +42,34 @@ export default class VoiceRecorder extends Component {
       { audio: true },
       this.setIsBlocked(true),
       this.setIsBlocked(false)
+    );
+  }
+
+  get recorder() {
+    const { isRecording, resetTimer } = this.state;
+
+    return (
+      <Timer
+        {...this.props}
+        isRunning={isRecording}
+        onTimerStop={this.stopRecording}
+        resetTimer={resetTimer}
+      />
+    );
+  }
+
+  get buttons() {
+    const { isRecording, recordedAudio } = this.state;
+
+    return (
+      <Fragment>
+        {isRecording ? (
+          <button onClick={this.stopRecording}>Stop</button>
+        ) : (
+          <button onClick={this.startRecording}>Record</button>
+        )}
+        {recordedAudio && <button onClick={this.resetRecorder}>Reset</button>}
+      </Fragment>
     );
   }
 
@@ -62,7 +86,7 @@ export default class VoiceRecorder extends Component {
     } else {
       Mp3Recorder.start()
         .then(() => {
-          this.setState(() => ({ isRecording: true }));
+          this.setState(() => ({ isRecording: true, resetTimer: false }));
         })
         .catch((e) => console.error(e));
     }
@@ -95,50 +119,15 @@ export default class VoiceRecorder extends Component {
     this.setState(() => ({ isRecording: false }));
   }
 
-  reportElapsedTime(recordingElapsed) {
-    this.setState(() => ({ recordingElapsed }));
-  }
-
-  get recorder() {
-    const { maxRecordingTime } = this.props;
-    const { isRecording, recordingElapsed } = this.state;
-
-    const initialTimeInSeconds = moment
-      .duration(`00:${maxRecordingTime}`)
-      .asSeconds();
-
-    return (
-      <Fragment>
-        <ProgressBar
-          currentProgress={recordingElapsed}
-          maxProgress={initialTimeInSeconds}
-        />
-        <Timer
-          {...this.props}
-          isRunning={isRecording}
-          maxTime={maxRecordingTime}
-          onTimerStop={this.stopRecording}
-          reportElapsedTime={this.reportElapsedTime}
-        />
-      </Fragment>
-    );
-  }
-
-  get buttons() {
-    const { isRecording } = this.state;
-
-    return isRecording ? (
-      <button onClick={this.stopRecording}>Stop</button>
-    ) : (
-      <button onClick={this.startRecording}>Record</button>
-    );
+  resetRecorder() {
+    this.setState(this.initialPlayerState);
   }
 
   render() {
     return (
       <div>
-        {this.buttons}
         {this.recorder}
+        {this.buttons}
       </div>
     );
   }

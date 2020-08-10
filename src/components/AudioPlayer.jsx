@@ -52,6 +52,28 @@ export default class AudioPlayer extends Component {
     }
   }
 
+  get player() {
+    const {
+      audioDuration,
+      currentTime,
+      rawCurrentTime,
+      rawDuration,
+    } = this.state;
+
+    return (
+      <div>
+        <div>
+          {this.renderPlaybackTime(currentTime)}
+          {this.renderPlaybackTime(audioDuration)}
+        </div>
+        <ProgressBar
+          currentProgress={rawCurrentTime}
+          maxProgress={rawDuration}
+        />
+      </div>
+    );
+  }
+
   loadAudio() {
     const { audio } = this.props;
 
@@ -124,28 +146,6 @@ export default class AudioPlayer extends Component {
 
   makeDoubleDigit(number) {
     return number < 10 ? `0${number}` : `${number}`;
-  }
-
-  get player() {
-    const {
-      audioDuration,
-      currentTime,
-      rawCurrentTime,
-      rawDuration,
-    } = this.state;
-
-    return (
-      <div>
-        <div>
-          {this.renderPlaybackTime(currentTime)}
-          {this.renderPlaybackTime(audioDuration)}
-        </div>
-        <ProgressBar
-          currentProgress={rawCurrentTime}
-          maxProgress={rawDuration}
-        />
-      </div>
-    );
   }
 
   render() {
