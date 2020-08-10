@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
+import { func, string } from "prop-types";
 import MicRecorder from "mic-recorder-to-mp3";
 import moment from "moment";
 
@@ -12,15 +12,13 @@ const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
 export default class VoiceRecorder extends Component {
   static propTypes = {
-    maxRecordingTime: PropTypes.string.isRequired,
-    onRecordStart: PropTypes.func,
-    onRecordStop: PropTypes.func,
+    maxRecordingTime: string.isRequired,
+    onRecordStart: func,
+    onRecordStop: func,
   };
 
   constructor(props) {
     super(props);
-
-    this.baseClass = "bve-voice-recorder";
 
     this.initialPlayerState = {
       isPlaying: false,
@@ -60,7 +58,7 @@ export default class VoiceRecorder extends Component {
     const { isBlocked } = this.state;
 
     if (isBlocked) {
-      // to be addressed in future story
+      // TODO
     } else {
       Mp3Recorder.start()
         .then(() => {
@@ -126,30 +124,20 @@ export default class VoiceRecorder extends Component {
     );
   }
 
-  get recordingIcon() {
+  get buttons() {
     const { isRecording } = this.state;
 
     return isRecording ? (
-      <button
-        description="stop icon"
-        fill="error"
-        name="stop"
-        onClick={this.stopRecording}
-      />
+      <button onClick={this.stopRecording}>Stop</button>
     ) : (
-      <button
-        description="record icon"
-        fill="inactive"
-        name="record"
-        onClick={this.startRecording}
-      />
+      <button onClick={this.startRecording}>Record</button>
     );
   }
 
   render() {
     return (
-      <div className={this.baseClass}>
-        {this.recordingIcon}
+      <div>
+        {this.buttons}
         {this.recorder}
       </div>
     );

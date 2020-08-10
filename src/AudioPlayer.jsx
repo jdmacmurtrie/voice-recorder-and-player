@@ -1,17 +1,15 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
+import { string } from "prop-types";
 
 import ProgressBar from "./ProgressBar";
 
 export default class AudioPlayer extends Component {
   static propTypes = {
-    audio: PropTypes.string.isRequired,
+    audio: string.isRequired,
   };
 
   constructor(props) {
     super(props);
-
-    this.baseClass = "bve-audio-player";
 
     this.initialPlayerState = {
       isPlaying: false,
@@ -98,29 +96,15 @@ export default class AudioPlayer extends Component {
   }
 
   resetPlayer() {
-    this.setState(() => ({
-      ...this.initialPlayerState,
-    }));
+    this.setState(() => this.initialPlayerState);
   }
 
   renderPlaybackTime(text) {
-    return (
-      <div className={`${this.baseClass}-playback-time`} size="m" type="body">
-        {text}
-      </div>
-    );
+    return <div>{text}</div>;
   }
 
-  renderIcon(name, onClick) {
-    return (
-      <button
-        className={`${this.baseClass}-icon`}
-        description={`${name} icon`}
-        fill="primary"
-        name={name}
-        onClick={onClick}
-      />
-    );
+  renderButton(name, onClick) {
+    return <button onClick={onClick}>{name}</button>;
   }
 
   convertSecondsToTime(number) {
@@ -151,8 +135,8 @@ export default class AudioPlayer extends Component {
     } = this.state;
 
     return (
-      <div className={`${this.baseClass}-playback-progress`}>
-        <div className={`${this.baseClass}-play-timers`}>
+      <div>
+        <div>
           {this.renderPlaybackTime(currentTime)}
           {this.renderPlaybackTime(audioDuration)}
         </div>
@@ -168,10 +152,10 @@ export default class AudioPlayer extends Component {
     const { audioSrc, isPlaying } = this.state;
 
     return (
-      <div className={this.baseClass}>
+      <div>
         {isPlaying
-          ? this.renderIcon("pause", this.pause)
-          : this.renderIcon("play", this.play)}
+          ? this.renderButton("Pause", this.pause)
+          : this.renderButton("Play", this.play)}
         {this.player}
         <audio ref={(audio) => (this.audio = audio)} src={audioSrc} />
       </div>

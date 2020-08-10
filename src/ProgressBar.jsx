@@ -1,12 +1,10 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
+import { number, oneOfType, string } from "prop-types";
 
 export default class ProgressBar extends Component {
   static propTypes = {
-    currentProgress: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
-      .isRequired,
-    maxProgress: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
-      .isRequired,
+    currentProgress: oneOfType([number, string]).isRequired,
+    maxProgress: oneOfType([number, string]).isRequired,
   };
 
   get progressBarWidth() {
@@ -21,8 +19,8 @@ export default class ProgressBar extends Component {
 
   render() {
     return (
-      <div className="bve-progress-bar">
-        <span className="bve-progress-bar-fill" style={this.progressBarWidth} />
+      <div className="progress-bar">
+        <span className="progress-bar-fill" style={this.progressBarWidth} />
       </div>
     );
   }

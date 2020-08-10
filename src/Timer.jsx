@@ -1,20 +1,14 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
-import classNames from "classnames";
+import { bool, func, number, oneOfType, string } from "prop-types";
 import moment from "moment";
-
-// import { Text } from "bsd-react-ui-kit";
-
-// import { formatAsTime } from "utils";
 
 export default class Timer extends Component {
   static propTypes = {
-    isRunning: PropTypes.bool,
-    maxTime: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
-      .isRequired,
-    maxTimeWarning: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    onTimerStop: PropTypes.func,
-    reportElapsedTime: PropTypes.func,
+    isRunning: bool,
+    maxTime: oneOfType([number, string]).isRequired,
+    maxTimeWarning: oneOfType([number, string]),
+    onTimerStop: func,
+    reportElapsedTime: func,
   };
 
   static defaultProps = {
@@ -24,13 +18,10 @@ export default class Timer extends Component {
   constructor(props) {
     super(props);
 
-    this.baseClass = "bve-timer";
-
     /*
       The maxTime prop can be either formatted either as a single number representing minutes, or as "minutes:seconds".
       If a single number is passed, it may be either a string or a number.
     */
-
     this.maxTime = this.formatAsTime(moment(props.maxTime, "mmss"));
 
     this.state = {
@@ -121,14 +112,8 @@ export default class Timer extends Component {
     const { elapsedTime } = this.state;
 
     const warningClass =
-      maxTimeWarning && this.warningActive
-        ? `${this.baseClass}--warning`
-        : undefined;
+      maxTimeWarning && this.warningActive ? "warning" : undefined;
 
-    return (
-      <div className={classNames(this.baseClass, warningClass)}>
-        {elapsedTime}
-      </div>
-    );
+    return <div className={warningClass}>{elapsedTime}</div>;
   }
 }
