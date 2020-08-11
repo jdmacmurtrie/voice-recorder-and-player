@@ -1,0 +1,10 @@
+.recorder {
+  &-timer {
+    margin-top: 10px;
+    color: green;
+
+    &--finished {
+      color: red;
+    }
+  }
+}

@@ -1,8 +1,12 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import { func } from "prop-types";
+import classNames from "classnames";
 import MicRecorder from "mic-recorder-to-mp3";
 
 import Timer from "./Timer";
+import record from "../icons/record.svg";
+import reset from "../icons/reset.svg";
+import stop from "../icons/stop.svg";
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -45,12 +49,14 @@ export default class VoiceRecorder extends Component {
     );
   }
 
-  get recorder() {
-    const { isRecording, resetTimer } = this.state;
+  get timer() {
+    const { isRecording, recordedAudio, resetTimer } = this.state;
+    const modifier = recordedAudio ? "recorder-timer--finished" : "";
 
     return (
       <Timer
         {...this.props}
+        className={classNames("recorder-timer", modifier)}
         isRunning={isRecording}
         onTimerStop={this.stopRecording}
         resetTimer={resetTimer}
@@ -58,18 +64,34 @@ export default class VoiceRecorder extends Component {
     );
   }
 
-  get buttons() {
+  get icon() {
     const { isRecording, recordedAudio } = this.state;
 
-    return (
-      <Fragment>
-        {isRecording ? (
-          <button onClick={this.stopRecording}>Stop</button>
-        ) : (
-          <button onClick={this.startRecording}>Record</button>
-        )}
-        {recordedAudio && <button onClick={this.resetRecorder}>Reset</button>}
-      </Fragment>
+    if (recordedAudio) {
+      return (
+        <img
+          src={reset}
+          className="icon"
+          alt="reset icon"
+          onClick={this.resetRecorder}
+        />
+      );
+    }
+
+    return isRecording ? (
+      <img
+        src={stop}
+        className="icon"
+        alt="stop icon"
+        onClick={this.stopRecording}
+      />
+    ) : (
+      <img
+        src={record}
+        className="icon"
+        alt="record icon"
+        onClick={this.startRecording}
+      />
     );
   }
 
@@ -126,8 +148,8 @@ export default class VoiceRecorder extends Component {
   render() {
     return (
       <div>
-        {this.recorder}
-        {this.buttons}
+        {this.icon}
+        {this.timer}
       </div>
     );
   }

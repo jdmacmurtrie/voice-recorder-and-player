@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import { bool, func } from "prop-types";
+import { bool, func, string } from "prop-types";
 import moment from "moment";
 
 export default class Timer extends Component {
   static propTypes = {
+    className: string,
     isRunning: bool,
     onTimerStop: func,
     reportElapsedTime: func,
@@ -94,8 +95,9 @@ export default class Timer extends Component {
   }
 
   render() {
+    const { className } = this.props;
     const { elapsedTime } = this.state;
 
-    return <div>{elapsedTime}</div>;
+    return <div className={className}>{elapsedTime}</div>;
   }
 }

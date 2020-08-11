@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 
 import AudioPlayer from "./AudioPlayer";
 import VoiceRecorder from "./VoiceRecorder";

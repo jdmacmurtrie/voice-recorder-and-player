@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { string } from "prop-types";
 
 import ProgressBar from "./ProgressBar";
+import play from "../icons/play.svg";
+import pause from "../icons/pause.svg";
 
 export default class AudioPlayer extends Component {
   static propTypes = {
@@ -71,6 +73,15 @@ export default class AudioPlayer extends Component {
           maxProgress={rawDuration}
         />
       </div>
+    );
+  }
+
+  get icon() {
+    const { isPlaying } = this.state;
+    return isPlaying ? (
+      <img src={pause} className="icon" alt="pause icon" onClick={this.pause} />
+    ) : (
+      <img src={play} className="icon" alt="play icon" onClick={this.play} />
     );
   }
 
@@ -149,14 +160,11 @@ export default class AudioPlayer extends Component {
   }
 
   render() {
-    const { audioSrc, isPlaying } = this.state;
+    const { audioSrc } = this.state;
 
     return (
       <div>
-        {isPlaying
-          ? this.renderButton("Pause", this.pause)
-          : this.renderButton("Play", this.play)}
-        {this.player}
+        {this.icon} {this.player}
         <audio ref={(audio) => (this.audio = audio)} src={audioSrc} />
       </div>
     );
