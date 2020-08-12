@@ -1,0 +1,37 @@
+.recorder {
+  &-timer {
+    margin-top: 5px;
+    color: green;
+
+    &--finished {
+      color: red;
+    }
+  }
+
+  &-animated-icon {
+    padding: 2px;
+    animation: pulse 2.5s infinite;
+    border-radius: 30%;
+  }
+
+  &-static-icon {
+    padding: 2px;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7);
+  }
+
+  65% {
+    transform: scale(1);
+    box-shadow: 0 0 0 5px rgba(0, 0, 0, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}

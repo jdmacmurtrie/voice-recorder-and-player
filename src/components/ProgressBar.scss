@@ -1,0 +1,13 @@
+.progress-bar {
+  height: 2px;
+  width: 100%;
+  background-color: gray;
+  margin: 5px;
+
+  &-fill {
+    display: block;
+    overflow: hidden;
+    background-color: blue;
+    height: 100%;
+  }
+}
