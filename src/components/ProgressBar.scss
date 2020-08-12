@@ -1,7 +1,8 @@
 .progress-bar {
-  height: 4px;
+  height: 2px;
   width: 100%;
   background-color: gray;
+  margin: 5px;
 
   &-fill {
     display: block;

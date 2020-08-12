@@ -71,7 +71,7 @@ export default class VoiceRecorder extends Component {
       return (
         <img
           src={reset}
-          className="icon"
+          className={classNames("icon", "recorder-static-icon")}
           alt="reset icon"
           onClick={this.resetRecorder}
         />
@@ -81,14 +81,14 @@ export default class VoiceRecorder extends Component {
     return isRecording ? (
       <img
         src={stop}
-        className="icon"
+        className={classNames("icon", "recorder-static-icon")}
         alt="stop icon"
         onClick={this.stopRecording}
       />
     ) : (
       <img
         src={record}
-        className="icon"
+        className={classNames("icon", "recorder-animated-icon")}
         alt="record icon"
         onClick={this.startRecording}
       />

@@ -1,0 +1,14 @@
+.audio-player {
+  display: flex;
+
+  &-main {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    font-size: 11px;
+  }
+
+  &-icon {
+    margin-right: 3px;
+  }
+}

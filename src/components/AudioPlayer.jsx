@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { string } from "prop-types";
+import classNames from "classnames";
 
 import ProgressBar from "./ProgressBar";
 import play from "../icons/play.svg";
@@ -63,15 +64,13 @@ export default class AudioPlayer extends Component {
     } = this.state;
 
     return (
-      <div>
-        <div>
-          {this.renderPlaybackTime(currentTime)}
-          {this.renderPlaybackTime(audioDuration)}
-        </div>
+      <div className="audio-player-main">
+        {this.renderPlaybackTime(currentTime)}
         <ProgressBar
           currentProgress={rawCurrentTime}
           maxProgress={rawDuration}
         />
+        {this.renderPlaybackTime(audioDuration)}
       </div>
     );
   }
@@ -79,9 +78,19 @@ export default class AudioPlayer extends Component {
   get icon() {
     const { isPlaying } = this.state;
     return isPlaying ? (
-      <img src={pause} className="icon" alt="pause icon" onClick={this.pause} />
+      <img
+        src={pause}
+        className={classNames("icon", "audio-player-icon")}
+        alt="pause icon"
+        onClick={this.pause}
+      />
     ) : (
-      <img src={play} className="icon" alt="play icon" onClick={this.play} />
+      <img
+        src={play}
+        className={classNames("icon", "audio-player-icon")}
+        alt="play icon"
+        onClick={this.play}
+      />
     );
   }
 
@@ -132,8 +141,8 @@ export default class AudioPlayer extends Component {
     this.setState(() => this.initialPlayerState);
   }
 
-  renderPlaybackTime(text) {
-    return <div>{text}</div>;
+  renderPlaybackTime(time) {
+    return <div>{time}</div>;
   }
 
   renderButton(name, onClick) {
@@ -142,7 +151,7 @@ export default class AudioPlayer extends Component {
 
   convertSecondsToTime(number) {
     if (!number) {
-      return "";
+      return "00:00";
     }
     const seconds = Math.abs(number) / 60;
     const sec = Math.round((seconds * 60) % 60);
@@ -150,6 +159,7 @@ export default class AudioPlayer extends Component {
       sec === 60 ? Math.round(seconds) : seconds.toString().split(".")[0];
     const minute = min > 4 ? "4" : min;
     const smartSeconds = sec === 60 || minute === "4" ? "0" : sec;
+
     return `${this.makeDoubleDigit(minute)}:${this.makeDoubleDigit(
       smartSeconds
     )}`;
@@ -163,8 +173,9 @@ export default class AudioPlayer extends Component {
     const { audioSrc } = this.state;
 
     return (
-      <div>
-        {this.icon} {this.player}
+      <div className="audio-player">
+        {this.icon}
+        {this.player}
         <audio ref={(audio) => (this.audio = audio)} src={audioSrc} />
       </div>
     );
