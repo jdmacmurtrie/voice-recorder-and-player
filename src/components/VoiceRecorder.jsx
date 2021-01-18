@@ -42,6 +42,7 @@ export default class VoiceRecorder extends Component {
   }
 
   componentDidMount() {
+    // requests access to use browser microphone
     navigator.mediaDevices.getUserMedia(
       { audio: true },
       this.setIsBlocked(true),
@@ -96,7 +97,7 @@ export default class VoiceRecorder extends Component {
   }
 
   setIsBlocked(isBlocked) {
-    this.setState(() => ({ isBlocked }));
+    this.setState({ isBlocked });
   }
 
   startRecording() {
@@ -108,7 +109,7 @@ export default class VoiceRecorder extends Component {
     } else {
       Mp3Recorder.start()
         .then(() => {
-          this.setState(() => ({ isRecording: true, resetTimer: false }));
+          this.setState({ isRecording: true, resetTimer: false });
         })
         .catch((e) => console.error(e));
     }
@@ -126,19 +127,20 @@ export default class VoiceRecorder extends Component {
       return;
     }
 
+    // The mic-recorder-to-mp3 does all the heavy lifting here to grab the recorded audio
     Mp3Recorder.stop()
       .getMp3()
       .then(([, blob]) => {
         const recordedAudio = URL.createObjectURL(blob);
 
-        this.setState(() => ({ recordedAudio, isRecording: false }));
+        this.setState({ recordedAudio, isRecording: false });
         if (onRecordStop) {
           onRecordStop(recordedAudio);
         }
       })
       .catch((e) => console.warn(e));
 
-    this.setState(() => ({ isRecording: false }));
+    this.setState({ isRecording: false });
   }
 
   resetRecorder() {

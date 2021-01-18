@@ -8,7 +8,6 @@ export default class AudioPlayerRecorderContainer extends Component {
     super(props);
 
     this.stopRecording = this.stopRecording.bind(this);
-    this.resetRecording = this.resetRecording.bind(this);
 
     this.state = {
       audio: "",
@@ -18,10 +17,7 @@ export default class AudioPlayerRecorderContainer extends Component {
   get recorder() {
     return (
       <div className="recorder-container">
-        <VoiceRecorder
-          onRecordStop={this.stopRecording}
-          maxRecordingTime="00:10"
-        />
+        <VoiceRecorder onRecordStop={this.stopRecording} />
       </div>
     );
   }
@@ -30,17 +26,17 @@ export default class AudioPlayerRecorderContainer extends Component {
     const { audio } = this.state;
     return (
       <div className="player-container">
-        {audio ? <AudioPlayer audio={audio} /> : <div>No recordings yet!</div>}
+        {audio ? (
+          <AudioPlayer audioSrc={audio} />
+        ) : (
+          <div>Nothing recorded yet!</div>
+        )}
       </div>
     );
   }
 
   stopRecording(recordedAudio) {
-    this.setState(() => ({ audio: recordedAudio }));
-  }
-
-  resetRecording() {
-    this.setState(() => ({ audio: "" }));
+    this.setState({ audio: recordedAudio });
   }
 
   render() {

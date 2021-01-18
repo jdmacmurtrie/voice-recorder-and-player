@@ -8,7 +8,7 @@ import pause from "../icons/pause.svg";
 
 export default class AudioPlayer extends Component {
   static propTypes = {
-    audio: string.isRequired,
+    audioSrc: string.isRequired,
   };
 
   constructor(props) {
@@ -31,27 +31,17 @@ export default class AudioPlayer extends Component {
   }
 
   componentDidMount() {
-    const { audio } = this.props;
-
-    if (audio) {
-      this.loadAudio();
-    }
-
+    // These event listeners keep the timer in sync with the run time of the recorded audio
     this.audio.addEventListener("timeupdate", (e) => this.timeUpdate(e));
     this.audio.addEventListener("loadedmetadata", (e) => this.loadMetaData(e));
   }
 
-  componentDidUpdate(prevProps) {
-    const { audio } = this.props;
+  componentDidUpdate() {
     const { isPlaying } = this.state;
     const { currentTime, duration } = this.audio;
 
     if (isPlaying && currentTime === duration) {
       this.pause();
-    }
-
-    if (prevProps.audio !== audio) {
-      this.loadAudio();
     }
   }
 
@@ -65,12 +55,12 @@ export default class AudioPlayer extends Component {
 
     return (
       <div className="audio-player-main">
-        {this.renderPlaybackTime(currentTime)}
+        <div>{currentTime}</div>
         <ProgressBar
           currentProgress={rawCurrentTime}
           maxProgress={rawDuration}
         />
-        {this.renderPlaybackTime(audioDuration)}
+        <div>{audioDuration}</div>
       </div>
     );
   }
@@ -94,14 +84,8 @@ export default class AudioPlayer extends Component {
     );
   }
 
-  loadAudio() {
-    const { audio } = this.props;
-
-    this.setState(() => ({ audioSrc: audio }));
-  }
-
-  timeUpdate(e) {
-    const { currentTime, duration } = e.target;
+  timeUpdate(event) {
+    const { currentTime, duration } = event.target;
 
     if (currentTime === duration) {
       this.resetPlayer();
@@ -111,56 +95,52 @@ export default class AudioPlayer extends Component {
     const formattedCurrent = this.convertSecondsToTime(currentTime);
     const formattedDuration = this.convertSecondsToTime(duration);
 
-    this.setState(() => ({
+    this.setState({
       audioDuration: formattedDuration,
       currentTime: formattedCurrent,
       rawCurrentTime: currentTime,
       rawDuration: duration,
-    }));
+    });
   }
 
-  loadMetaData(e) {
-    const { duration } = e.target;
+  loadMetaData(event) {
+    const { duration } = event.target;
     const audioDuration = this.convertSecondsToTime(duration);
 
-    this.setState(() => ({ audioDuration }));
+    this.setState({ audioDuration });
   }
 
   play() {
-    this.setState(() => ({ isPlaying: true }));
+    this.setState({ isPlaying: true });
 
     this.audio.play();
   }
 
   pause() {
-    this.setState(() => ({ isPlaying: false }));
+    this.setState({ isPlaying: false });
     this.audio.pause();
   }
 
   resetPlayer() {
-    this.setState(() => this.initialPlayerState);
-  }
-
-  renderPlaybackTime(time) {
-    return <div>{time}</div>;
-  }
-
-  renderButton(name, onClick) {
-    return <button onClick={onClick}>{name}</button>;
+    this.setState(this.initialPlayerState);
   }
 
   convertSecondsToTime(number) {
     if (!number) {
       return "00:00";
     }
-    const seconds = Math.abs(number) / 60;
-    const sec = Math.round((seconds * 60) % 60);
-    const min =
-      sec === 60 ? Math.round(seconds) : seconds.toString().split(".")[0];
-    const minute = min > 4 ? "4" : min;
-    const smartSeconds = sec === 60 || minute === "4" ? "0" : sec;
 
-    return `${this.makeDoubleDigit(minute)}:${this.makeDoubleDigit(
+    const seconds = Math.abs(number) / 60;
+    const roundedSeconds = Math.round((seconds * 60) % 60);
+
+    const minutes =
+      roundedSeconds === 60
+        ? Math.round(seconds)
+        : seconds.toString().split(".")[0];
+
+    const smartSeconds = roundedSeconds === 60 ? "0" : roundedSeconds;
+
+    return `${this.makeDoubleDigit(minutes)}:${this.makeDoubleDigit(
       smartSeconds
     )}`;
   }
@@ -170,7 +150,7 @@ export default class AudioPlayer extends Component {
   }
 
   render() {
-    const { audioSrc } = this.state;
+    const { audioSrc } = this.props;
 
     return (
       <div className="audio-player">

@@ -23,14 +23,6 @@ export default class Timer extends Component {
     };
   }
 
-  componentDidMount() {
-    const { isRunning } = this.props;
-
-    if (isRunning) {
-      this.handleStart();
-    }
-  }
-
   componentDidUpdate(prevProps) {
     const { isRunning, resetTimer } = this.props;
     const { elapsedTime } = this.state;
@@ -43,10 +35,6 @@ export default class Timer extends Component {
       }
     }
 
-    if (elapsedTime === this.maxTime && isRunning) {
-      this.handleStop();
-    }
-
     if (resetTimer && elapsedTime !== "00:00") {
       this.setState({ elapsedTime: "00:00" });
     }
@@ -54,23 +42,26 @@ export default class Timer extends Component {
 
   componentWillUnmount() {
     if (this.timer) {
+      // stops the setInterval timer
       clearInterval(this.timer);
     }
   }
 
   handleStart() {
+    // this.timer is a function that checks in every 1000 milliseconds, (second argument).
+    // This will keep the timer up to date.
     this.timer = setInterval(() => {
       const { reportElapsedTime } = this.props;
-
       const { elapsedTime } = this.state;
 
       const newTime = this.formatAsTime(
         moment(elapsedTime, "mmss").add(1, "seconds")
       );
 
-      this.setState(() => ({ elapsedTime: newTime }));
+      this.setState({ elapsedTime: newTime });
 
       if (reportElapsedTime) {
+        // TODO this assumes the timer will not run more than an hour.  Make more flexible, at least for posterity's sake.
         const elapsedInSeconds = moment.duration(`00:${newTime}`).asSeconds();
 
         reportElapsedTime(elapsedInSeconds);
