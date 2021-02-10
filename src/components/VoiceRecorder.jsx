@@ -4,23 +4,21 @@ import classNames from "classnames";
 import MicRecorder from "mic-recorder-to-mp3";
 
 import Timer from "./Timer";
-import record from "../icons/record.svg";
-import reset from "../icons/reset.svg";
-import stop from "../icons/stop.svg";
-
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
+import recordIcon from "../icons/record.svg";
+import resetIcon from "../icons/reset.svg";
+import stopIcon from "../icons/stop.svg";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
 export default class VoiceRecorder extends Component {
   static propTypes = {
-    onRecordStart: func,
     onRecordStop: func,
   };
 
   constructor(props) {
     super(props);
 
+    // declared separately for easy reset
     this.initialPlayerState = {
       isBlocked: false,
       isRecording: false,
@@ -33,10 +31,6 @@ export default class VoiceRecorder extends Component {
       currentTime: "00:00",
       rawCurrentTime: 0,
     };
-
-    this.resetRecorder = this.resetRecorder.bind(this);
-    this.startRecording = this.startRecording.bind(this);
-    this.stopRecording = this.stopRecording.bind(this);
 
     this.state = this.initialPlayerState;
   }
@@ -51,14 +45,15 @@ export default class VoiceRecorder extends Component {
   }
 
   get timer() {
+    const { onRecordStop } = this.props;
     const { isRecording, recordedAudio, resetTimer } = this.state;
     const modifier = recordedAudio ? "recorder-timer--finished" : "";
 
     return (
       <Timer
-        {...this.props}
         className={classNames("recorder-timer", modifier)}
         isRunning={isRecording}
+        onRecordStop={onRecordStop}
         onTimerStop={this.stopRecording}
         resetTimer={resetTimer}
       />
@@ -71,7 +66,7 @@ export default class VoiceRecorder extends Component {
     if (recordedAudio) {
       return (
         <img
-          src={reset}
+          src={resetIcon}
           className={classNames("icon", "recorder-static-icon")}
           alt="reset icon"
           onClick={this.resetRecorder}
@@ -81,14 +76,14 @@ export default class VoiceRecorder extends Component {
 
     return isRecording ? (
       <img
-        src={stop}
+        src={stopIcon}
         className={classNames("icon", "recorder-static-icon")}
         alt="stop icon"
         onClick={this.stopRecording}
       />
     ) : (
       <img
-        src={record}
+        src={recordIcon}
         className={classNames("icon", "recorder-animated-icon")}
         alt="record icon"
         onClick={this.startRecording}
@@ -96,30 +91,19 @@ export default class VoiceRecorder extends Component {
     );
   }
 
-  setIsBlocked(isBlocked) {
+  setIsBlocked = (isBlocked) => {
     this.setState({ isBlocked });
-  }
+  };
 
-  startRecording() {
-    const { onRecordStart } = this.props;
-    const { isBlocked } = this.state;
+  startRecording = () => {
+    Mp3Recorder.start()
+      .then(() => {
+        this.setState({ isRecording: true, resetTimer: false });
+      })
+      .catch((e) => console.error(e));
+  };
 
-    if (isBlocked) {
-      // TODO
-    } else {
-      Mp3Recorder.start()
-        .then(() => {
-          this.setState({ isRecording: true, resetTimer: false });
-        })
-        .catch((e) => console.error(e));
-    }
-
-    if (onRecordStart) {
-      onRecordStart();
-    }
-  }
-
-  stopRecording() {
+  stopRecording = () => {
     const { onRecordStop } = this.props;
     const { isRecording } = this.state;
 
@@ -133,22 +117,24 @@ export default class VoiceRecorder extends Component {
       .then(([, blob]) => {
         const recordedAudio = URL.createObjectURL(blob);
 
+        onRecordStop(recordedAudio);
         this.setState({ recordedAudio, isRecording: false });
-        if (onRecordStop) {
-          onRecordStop(recordedAudio);
-        }
       })
       .catch((e) => console.warn(e));
 
     this.setState({ isRecording: false });
-  }
+  };
 
-  resetRecorder() {
+  resetRecorder = () => {
     this.setState(this.initialPlayerState);
-  }
+  };
 
   render() {
-    return (
+    const { isBlocked } = this.state;
+
+    return isBlocked ? (
+      <div>Please must give browser permission to make a recording</div>
+    ) : (
       <div>
         {this.icon}
         {this.timer}

@@ -47,7 +47,7 @@ export default class Timer extends Component {
     }
   }
 
-  handleStart() {
+  handleStart = () => {
     // this.timer is a function that checks in every 1000 milliseconds, (second argument).
     // This will keep the timer up to date.
     this.timer = setInterval(() => {
@@ -67,23 +67,19 @@ export default class Timer extends Component {
         reportElapsedTime(elapsedInSeconds);
       }
     }, 1000);
-  }
+  };
 
-  handleStop() {
+  handleStop = () => {
     const { onTimerStop } = this.props;
 
     if (this.timer) {
       clearInterval(this.timer);
     }
 
-    if (onTimerStop) {
-      onTimerStop();
-    }
-  }
+    onTimerStop();
+  };
 
-  formatAsTime(time) {
-    return time.format("mm:ss");
-  }
+  formatAsTime = (time) => time.format("mm:ss");
 
   render() {
     const { className } = this.props;

@@ -14,14 +14,12 @@ export default class AudioPlayer extends Component {
   constructor(props) {
     super(props);
 
+    // declared separately for easy reset
     this.initialPlayerState = {
       isPlaying: false,
       currentTime: "00:00",
       rawCurrentTime: 0,
     };
-
-    this.play = this.play.bind(this);
-    this.pause = this.pause.bind(this);
 
     this.state = {
       rawDuration: 0,
@@ -31,18 +29,10 @@ export default class AudioPlayer extends Component {
   }
 
   componentDidMount() {
-    // These event listeners keep the timer in sync with the run time of the recorded audio
-    this.audio.addEventListener("timeupdate", (e) => this.timeUpdate(e));
+    // loadedmetadata fires when the audio data has been fully loaded
     this.audio.addEventListener("loadedmetadata", (e) => this.loadMetaData(e));
-  }
-
-  componentDidUpdate() {
-    const { isPlaying } = this.state;
-    const { currentTime, duration } = this.audio;
-
-    if (isPlaying && currentTime === duration) {
-      this.pause();
-    }
+    // timeupdate checks in while the audio is playing to keep the time up to date
+    this.audio.addEventListener("timeupdate", (e) => this.timeUpdate(e));
   }
 
   get player() {
@@ -67,6 +57,7 @@ export default class AudioPlayer extends Component {
 
   get icon() {
     const { isPlaying } = this.state;
+
     return isPlaying ? (
       <img
         src={pause}
@@ -84,12 +75,15 @@ export default class AudioPlayer extends Component {
     );
   }
 
-  timeUpdate(event) {
+  timeUpdate = (event) => {
     const { currentTime, duration } = event.target;
 
     if (currentTime === duration) {
-      this.resetPlayer();
-      return;
+      // allows the user to see the completion timer/progress bar
+      setTimeout(() => {
+        this.resetPlayer();
+        return;
+      }, 500);
     }
 
     const formattedCurrent = this.convertSecondsToTime(currentTime);
@@ -101,35 +95,31 @@ export default class AudioPlayer extends Component {
       rawCurrentTime: currentTime,
       rawDuration: duration,
     });
-  }
+  };
 
-  loadMetaData(event) {
+  loadMetaData = (event) => {
     const { duration } = event.target;
     const audioDuration = this.convertSecondsToTime(duration);
 
     this.setState({ audioDuration });
-  }
+  };
 
-  play() {
+  play = () => {
     this.setState({ isPlaying: true });
 
     this.audio.play();
-  }
+  };
 
-  pause() {
+  pause = () => {
     this.setState({ isPlaying: false });
     this.audio.pause();
-  }
+  };
 
-  resetPlayer() {
+  resetPlayer = () => {
     this.setState(this.initialPlayerState);
-  }
+  };
 
-  convertSecondsToTime(number) {
-    if (!number) {
-      return "00:00";
-    }
-
+  convertSecondsToTime = (number) => {
     const seconds = Math.abs(number) / 60;
     const roundedSeconds = Math.round((seconds * 60) % 60);
 
@@ -143,11 +133,9 @@ export default class AudioPlayer extends Component {
     return `${this.makeDoubleDigit(minutes)}:${this.makeDoubleDigit(
       smartSeconds
     )}`;
-  }
+  };
 
-  makeDoubleDigit(number) {
-    return number < 10 ? `0${number}` : `${number}`;
-  }
+  makeDoubleDigit = (number) => (number < 10 ? `0${number}` : `${number}`);
 
   render() {
     const { audioSrc } = this.props;
