@@ -1,15 +1,16 @@
 .progress-bar {
-  height: 2px;
+  height: 4px;
   width: 100%;
   background-color: gray;
   margin: 5px;
+  border-radius: 5px;
 
   &-fill {
     display: block;
     overflow: hidden;
     background-color: blue;
     height: 100%;
+    border-radius: 5px;
+    transition: width 0.4s;
   }
-
-  // TODO find a transition effect to use
 }
